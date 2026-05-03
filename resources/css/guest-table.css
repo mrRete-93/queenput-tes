@@ -1,0 +1,48 @@
+.buku-container {
+    padding: 15px;
+    background: #f3f4f6;
+    min-height: 100vh;
+}
+
+.header {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.header input,
+.header select {
+    padding: 8px;
+    border: 1px solid #ccc;
+}
+
+.tbl {
+    width: 100%;
+    background: white;
+    border-collapse: collapse;
+}
+
+.tbl td {
+    border-bottom: 1px solid #eee;
+}
+
+.ci {
+    width: 100%;
+    border: none;
+    padding: 10px;
+    outline: none;
+}
+
+.ci:focus {
+    background: #eef6ff;
+}
+
+.btn-plus {
+    margin-top: 10px;
+    padding: 12px;
+    background: #111;
+    color: white;
+    border: none;
+    width: 100%;
+    cursor: pointer;
+}
