@@ -10,20 +10,26 @@ use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\URL;
 
 class AppServiceProvider extends ServiceProvider
 {
     public function register(): void {}
 
     public function boot(): void
-    {
-        // ── Daftarkan Observer ────────────────────────────────────────────────
-        Guest::observe(GuestObserver::class);
-        AppGuest::observe(AppGuestObserver::class);
-
-        // ── Rate Limiting ─────────────────────────────────────────────────────
-        $this->configureRateLimiting();
+{
+    // Tambah ini
+    if (config('app.env') === 'production') {
+        URL::forceScheme('https');
     }
+
+    // ── Daftarkan Observer ────────────────────────────────────────────────
+    Guest::observe(GuestObserver::class);
+    AppGuest::observe(AppGuestObserver::class);
+
+    // ── Rate Limiting ─────────────────────────────────────────────────────
+    $this->configureRateLimiting();
+}
 
     protected function configureRateLimiting(): void
     {
