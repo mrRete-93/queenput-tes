@@ -1,0 +1,1 @@
+import{j as e}from"./app-BEdgu9iX.js";function u({label:t,onClick:r,disabled:o=!1,color:n}){return e.jsx("button",{onClick:r,disabled:o,style:{color:"white",border:"none",borderRadius:"4px",fontWeight:"bold",padding:"6px 12px",background:n,cursor:o?"not-allowed":"pointer"},children:t})}export{u as default};
