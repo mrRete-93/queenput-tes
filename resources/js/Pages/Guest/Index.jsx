@@ -2,7 +2,7 @@ import AuthenticatedLayout        from '@/Layouts/AuthenticatedLayout';
 import { Head, router }           from '@inertiajs/react';
 import { useState, useCallback }  from 'react';
 import { useToast }              from '@/Hooks/UseToast';
-import { ToastContainer, ConfirmDialog } from '@/components/Toast';
+import { ToastContainer, ConfirmDialog } from '@/Components/Toast';
 
 import DownloadLaporan from "@/Components/DownloadLaporan";
 import STYLES                from '../../Constants/styles';
