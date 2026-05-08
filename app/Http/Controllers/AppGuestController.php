@@ -10,7 +10,9 @@ class AppGuestController extends Controller
 {
     public function index()
     {
-        $guests = AppGuest::where('user_id', auth()->id())
+        $guests = (auth()->user()->role === 'owner'
+            ? AppGuest::query()
+            : AppGuest::where('user_id', auth()->id()))
             ->latest()
             ->get();
 
@@ -89,7 +91,10 @@ class AppGuestController extends Controller
 
     public function update(Request $request, AppGuest $appGuest)
     {
-        abort_if($appGuest->user_id !== auth()->id(), 403);
+        abort_unless(
+            $appGuest->user_id === auth()->id() || auth()->user()->role === 'owner',
+            403
+        );
 
         $validated = $request->validate([
             'nomor_kamar'      => 'nullable|string|max:20',
@@ -110,7 +115,10 @@ class AppGuestController extends Controller
 
     public function destroy(AppGuest $appGuest)
     {
-        abort_if($appGuest->user_id !== auth()->id(), 403);
+        abort_unless(
+            $appGuest->user_id === auth()->id() || auth()->user()->role === 'owner',
+            403
+        );
 
         $appGuest->delete();
         return redirect()->back();

@@ -2,7 +2,7 @@ import CellInput    from './CellInput';
 import ActionButton from './ActionButton';
 import { EXPENSE_COLS } from '../../../Constants/columns';
 
-export default function ExpenseRow({ g, onFieldChange, onSave, query }) {
+export default function ExpenseRow({ g, onFieldChange, onSave, onDelete, query }) {
     const isSaved = !!g.id;
     const canSave = !!(g.nama_barang && g.harga);
 
@@ -31,7 +31,7 @@ export default function ExpenseRow({ g, onFieldChange, onSave, query }) {
                     {!isSaved ? (
                         <ActionButton
                             label="SIMPAN"
-                            onClick={() => onSave(g)}
+                            onClick={() => onSave(g._id)}
                             disabled={!canSave}
                             color={canSave ? '#16a34a' : '#9ca3af'}
                         />

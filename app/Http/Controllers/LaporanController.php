@@ -87,12 +87,15 @@ class LaporanController extends Controller
 
     private function fetchByMonthYear(int $month, int $year): array
     {
+        $startDate = Carbon::create($year, $month, 1)->startOfMonth();
+        $endDate   = Carbon::create($year, $month, 1)->endOfMonth();
+
         $judulPeriode = Carbon::create($year, $month, 1)->isoFormat('MMMM YYYY');
 
         return [
-            Guest::whereMonth('created_at', $month)->whereYear('created_at', $year)->orderBy('created_at')->get(),
-            AppGuest::whereMonth('created_at', $month)->whereYear('created_at', $year)->orderBy('created_at')->get(),
-            Pengeluaran::whereMonth('created_at', $month)->whereYear('created_at', $year)->orderBy('created_at')->get(),
+            Guest::whereBetween('created_at', [$startDate, $endDate])->orderBy('created_at')->get(),
+            AppGuest::whereBetween('created_at', [$startDate, $endDate])->orderBy('created_at')->get(),
+            Pengeluaran::whereBetween('created_at', [$startDate, $endDate])->orderBy('created_at')->get(),
             $judulPeriode,
         ];
     }

@@ -2,7 +2,7 @@ import CellInput    from './CellInput';
 import ActionButton from './ActionButton';
 import { GUEST_HEAD_COLS, GUEST_TAIL_COLS } from '../../../Constants/columns';
 
-export default function GuestRow({ g, tab, getVal, onEdit, onNewRowChange, onBlur, onSave, onToggleStatus, query }) {
+export default function GuestRow({ g, tab, getVal, onEdit, onNewRowChange, onBlur, onSave, onToggleStatus, onDelete, query }) {
     const isSaved     = !!g.id;
     const isOut       = g.status === 'checkout';
     const isDbCheckin = isSaved && !isOut;
@@ -102,7 +102,7 @@ export default function GuestRow({ g, tab, getVal, onEdit, onNewRowChange, onBlu
             <td className="td td-aksi">
                 <div className="aksi-wrap">
                     {!isSaved ? (
-                        <ActionButton label="SIMPAN" onClick={() => onSave(g)} color="#16a34a" />
+                        <ActionButton label="SIMPAN" onClick={() => onSave(g._id)} color="#16a34a" />
                     ) : (
                         <>
                             <button

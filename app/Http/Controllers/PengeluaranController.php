@@ -11,7 +11,7 @@ class PengeluaranController extends Controller
     {
         $validated = $request->validate([
             'nama_barang'   => 'required|string',
-            'harga'         => 'required|string',
+            'harga'         => 'required|numeric|min:0',
             'keterangan'    => 'nullable|string',
             'shift_admin'   => 'required|string',
             'tanggal_input' => 'required|string',

@@ -1,6 +1,8 @@
 import AuthenticatedLayout        from '@/Layouts/AuthenticatedLayout';
 import { Head, router }           from '@inertiajs/react';
 import { useState, useCallback }  from 'react';
+import { useToast }              from '@/Hooks/UseToast';
+import { ToastContainer, ConfirmDialog } from '@/components/Toast';
 
 import DownloadLaporan from "@/Components/DownloadLaporan";
 import STYLES                from '../../Constants/styles';
@@ -49,6 +51,8 @@ export default function Index({ auth, guests = [], appGuests = [], expenses = []
     const [newRows, setNewRows] = useState([]);
     const [query,   setQuery]   = useState('');
 
+    const { toast, toasts, removeToast, confirm, showConfirm } = useToast();
+
     const { shiftActive, activeShiftInfo, shiftInp, handleInputChange, startShift, endShift } = useShift(auth?.user);
     const { getVal, setEdit, clearEdit, getBuffer } = useEditBuffer();
 
@@ -96,7 +100,7 @@ export default function Index({ auth, guests = [], appGuests = [], expenses = []
         
         // 1. Pastikan info shift tersedia sebelum simpan
         if (!activeShiftInfo) {
-            alert("Shift harus aktif untuk menyimpan data!");
+            toast.warning("Shift harus aktif untuk menyimpan data!");
             return;
         }
 
@@ -155,14 +159,15 @@ export default function Index({ auth, guests = [], appGuests = [], expenses = []
             },
             onError: (errors) => {
                 console.error("Gagal simpan:", errors);
-                alert("Cek kembali inputan: " + Object.values(errors).join(", "));
+                toast.error("Cek kembali inputan: " + Object.values(errors).join(", "));
             }
         });
     };
     
 
-    const deleteRow = (g) => {
-        if (!window.confirm(`Hapus data "${g.nama_tamu || g.nama_barang || 'ini'}"?`)) return;
+    const deleteRow = async (g) => {
+        const ok = await showConfirm(`Hapus data "${g.nama_tamu || g.nama_barang || 'ini'}"?`);
+        if (!ok) return;
 
         const routeMap = {
             reguler: { name: 'guest.destroy',       params: { guest: g.id }      },
@@ -173,7 +178,7 @@ export default function Index({ auth, guests = [], appGuests = [], expenses = []
 
         router.delete(route(name, params), {
             preserveScroll: true,
-            onSuccess: reloadCurrentTab,
+            onSuccess: () => { toast.success('Data berhasil dihapus.'); reloadCurrentTab(); },
         });
     };
 
@@ -188,6 +193,7 @@ export default function Index({ auth, guests = [], appGuests = [], expenses = []
     };
 
     return (
+        <>
         <AuthenticatedLayout user={auth?.user}>
             <Head title="Queenput - Admin" />
             <style>{STYLES}</style>
@@ -239,5 +245,8 @@ export default function Index({ auth, guests = [], appGuests = [], expenses = []
                 </button>
             )}
         </AuthenticatedLayout>
+        <ToastContainer toasts={toasts} onRemove={removeToast} />
+        <ConfirmDialog confirm={confirm} />
+    </>
     );
 }
