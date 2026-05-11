@@ -15,21 +15,20 @@ class GuestController extends Controller
         $month = $request->input('month', now()->month);
         $year  = $request->input('year', now()->year);
 
-        $guests = Guest::whereMonth('created_at', $month)
-                    ->whereYear('created_at', $year)
-                    ->orderBy('created_at', 'asc')
-                    ->get();
+        $guests = Guest::where('month', $month)
+                ->where('year', $year)
+                ->orderBy('created_at', 'asc')
+                ->get();
 
-        $appGuests = AppGuest::whereMonth('created_at', $month)
-                    ->whereYear('created_at', $year)
-                    ->orderBy('created_at', 'asc')
-                    ->get();
+        $appGuests = AppGuest::where('month', $month)
+                        ->where('year', $year)
+                        ->orderBy('created_at', 'asc')
+                        ->get();
 
-        $expenses = Pengeluaran::whereMonth('created_at', $month)
-                    ->whereYear('created_at', $year)
-                    ->orderBy('created_at', 'asc')
-                    ->get();
-
+        $expenses = Pengeluaran::where('month', $month)
+                        ->where('year', $year)
+                        ->orderBy('created_at', 'asc')
+                        ->get();
         return Inertia::render('Guest/Index', [
             'guests'        => $guests,
             'appGuests'     => $appGuests,

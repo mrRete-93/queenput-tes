@@ -16,7 +16,7 @@ export function useShift(currentUser) {
     useEffect(() => {
         axios.get('/api/shift/current')
             .then(res => {
-                if (res.data) {
+                if (res.data && res.data.id) {
                     setActiveShiftInfo(res.data);
                     setShiftActive(true);
                 } else {
