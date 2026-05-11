@@ -8,6 +8,7 @@ use App\Http\Controllers\DashboardKeuanganController;
 use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\PengeluaranController;
 use App\Http\Controllers\LaporanController;
+use App\Http\Controllers\ShiftController;
 
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -106,7 +107,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/audit/export', [AuditLogController::class, 'export'])->name('audit.export');
     });
 
-
+    Route::middleware(['role:owner,admin', 'throttle:admin-umum'])->group(function () {
+        Route::get('/api/shift/current', [ShiftController::class, 'current'])->name('shift.current');
+    });
+    Route::middleware(['role:owner,admin', 'throttle:admin-tulis'])->group(function () {
+        Route::post('/api/shift/start', [ShiftController::class, 'start'])->name('shift.start');
+        Route::post('/api/shift/end',   [ShiftController::class, 'end'])->name('shift.end');
+    });
+    Route::middleware(['role:owner,admin', 'throttle:admin-tulis'])->group(function () {
+        Route::delete('/pengeluaran/{pengeluaran}', [PengeluaranController::class, 'destroy'])->name('pengeluaran.destroy');
+    });
     // ── Profile (owner & admin) ───────────────────────────────────────────────
     Route::middleware(['role:owner,admin', 'throttle:admin-umum'])->group(function () {
         Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

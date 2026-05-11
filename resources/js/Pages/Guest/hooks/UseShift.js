@@ -1,60 +1,81 @@
 import { useState, useEffect } from 'react';
+import axios from 'axios';
 
-const STORAGE_KEY = 'active_shift';
-
-// Tambahkan parameter currentUser agar hook tahu siapa yang sedang login
-export function useShift(currentUser) { 
+export function useShift(currentUser) {
     const [shiftInp, setShiftInp] = useState({
-        name: '',
-        date: new Date().toISOString().split('T')[0],
+        name:    currentUser?.name ?? '',
+        date:    new Date().toISOString().split('T')[0],
         session: 'Pagi',
     });
 
-    // Validasi data di localStorage berdasarkan user aktif
-    const getActiveData = () => {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (!saved) return null;
+    const [activeShiftInfo, setActiveShiftInfo] = useState(null);
+    const [shiftActive,     setShiftActive]     = useState(false);
+    const [loading,         setLoading]         = useState(true);
 
-    const parsed = JSON.parse(saved);
+    // ── Ambil shift aktif dari server saat pertama load ───────────
+    useEffect(() => {
+        axios.get('/api/shift/current')
+            .then(res => {
+                if (res.data) {
+                    setActiveShiftInfo(res.data);
+                    setShiftActive(true);
+                } else {
+                    setActiveShiftInfo(null);
+                    setShiftActive(false);
+                }
+            })
+            .catch(() => {
+                setActiveShiftInfo(null);
+                setShiftActive(false);
+            })
+            .finally(() => setLoading(false));
+    }, []);
 
-    if (!currentUser) return parsed; // ⬅️ FIX penting
-
-    if (currentUser.role === 'owner' || parsed.userId === currentUser.id) {
-            return parsed;
-        }
-
-        return null;
-    };
-
-
-    const [activeShiftInfo, setActiveShiftInfo] = useState(getActiveData);
-    const [shiftActive, setShiftActive] = useState(() => !!getActiveData());
-
-    // Di dalam file UseShift.js
-    const startShift = () => {
+    // ── Mulai shift ───────────────────────────────────────────────
+    const startShift = async () => {
         if (!shiftInp.name || !currentUser?.id) {
-            alert("User belum siap / belum login");
+            alert('Nama admin harus diisi!');
             return;
         }
 
-        const dataToSave = { 
-            ...shiftInp, 
-            userId: currentUser.id, // ⬅️ jangan pakai optional lagi
-            startTime: new Date().toISOString() 
-        };
+        try {
+            const res = await axios.post('/api/shift/start', {
+                name:    shiftInp.name,
+                session: shiftInp.session,
+                date:    shiftInp.date,
+            });
 
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(dataToSave));
-        setActiveShiftInfo(dataToSave);
-        setShiftActive(true);
+            setActiveShiftInfo(res.data);
+            setShiftActive(true);
+        } catch (err) {
+            console.error('Gagal mulai shift:', err);
+            alert('Gagal memulai shift. Coba lagi.');
+        }
     };
 
-
-    const endShift = (onEnd) => {
-        localStorage.removeItem(STORAGE_KEY);
-        setShiftActive(false);
-        setActiveShiftInfo(null);
-        onEnd?.();
+    // ── Akhiri shift ──────────────────────────────────────────────
+    const endShift = async (onEnd) => {
+        try {
+            await axios.post('/api/shift/end');
+            setShiftActive(false);
+            setActiveShiftInfo(null);
+            onEnd?.();
+        } catch (err) {
+            console.error('Gagal akhiri shift:', err);
+            alert('Gagal mengakhiri shift. Coba lagi.');
+        }
     };
 
-    return { shiftActive, activeShiftInfo, shiftInp, handleInputChange: (field, value) => setShiftInp(p => ({...p, [field]: value})), startShift, endShift };
+    const handleInputChange = (field, value) =>
+        setShiftInp(prev => ({ ...prev, [field]: value }));
+
+    return {
+        shiftActive,
+        activeShiftInfo,
+        shiftInp,
+        loading,
+        handleInputChange,
+        startShift,
+        endShift,
+    };
 }

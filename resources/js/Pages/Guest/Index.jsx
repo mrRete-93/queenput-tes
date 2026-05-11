@@ -53,7 +53,7 @@ export default function Index({ auth, guests = [], appGuests = [], expenses = []
 
     const { toast, toasts, removeToast, confirm, showConfirm } = useToast();
 
-    const { shiftActive, activeShiftInfo, shiftInp, handleInputChange, startShift, endShift } = useShift(auth?.user);
+    const { shiftActive, activeShiftInfo, shiftInp, loading, handleInputChange, startShift, endShift } = useShift(auth?.user);
     const { getVal, setEdit, clearEdit, getBuffer } = useEditBuffer();
 
     const displayedRows = useDisplayedRows(guests, appGuests, expenses, tab, newRows, activeShiftInfo, query);
@@ -218,7 +218,8 @@ export default function Index({ auth, guests = [], appGuests = [], expenses = []
                     activeShiftInfo={activeShiftInfo}
                     onInputChange={handleInputChange}
                     onStart={startShift}
-                    onEndShift={() => endShift()} // Ini akan menghapus localStorage saat tugas selesai
+                    onEndShift={() => endShift()}
+                    loading={loading}
                 />
 
                 <div className="flex items-center justify-between mb-2">
